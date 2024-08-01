@@ -3,7 +3,7 @@ import './App.css'
 
 function App() {
 	const [data, setData] = useState([])
-	const [name, setName] = useState()
+	const [name, setName] = useState('')
 	const [tag, setTag] = useState()
 	const [difficulty, setDifficulty] = useState()
 	const [status, setStatus] = useState()
@@ -15,15 +15,19 @@ function App() {
 	})
 
 	useEffect(() => {
-		fetch(
-			`https://kep.uz/api/problems?page_size=${pagination.size}&page=${pagination.page}`
-		)
+		let url = `https://kep.uz/api/problems?page_size=${pagination.size}&page=${pagination.page}&title=${name}`
+
+		if (difficulty) {
+			url += `&difficulty=${difficulty}`
+		} 
+
+		fetch(url)
 			.then(res => res.json())
 			.then(res => {
 				setData(res.data)
 				setPagination({ ...pagination, total: res.pagesCount })
 			})
-	}, [pagination.page, pagination.size])
+	}, [pagination.page, pagination.size, name, difficulty, status])
 
 	function prev() {
 		if (pagination.page !== 1) {
@@ -74,7 +78,23 @@ function App() {
 
 	return (
 		<div>
-			<div>{/* filter */}</div>
+			<div>
+				<input
+					type='text'
+					placeholder='nomi'
+					onChange={e => setName(e.target.value)}
+				/>
+				<select onChange={e => setDifficulty(e.target.value)}>
+					<option value={1}>Boshlangich</option>
+					<option value={3}>Normal</option>
+					<option value={6}>Qiyin</option>
+				</select>
+				<select onChange={e => setStatus(e.target.value)}>
+					<option value={3}>Noaniq</option>
+					<option value={1}>Ishlangan</option>
+					<option value={2}>Ishlanmagan</option>
+				</select>
+			</div>
 			<div>
 				<table className='table' border={1}>
 					<thead>
